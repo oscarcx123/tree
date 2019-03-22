@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Azure's Tree</title>
+  <!-- <link rel="shortcut icon" type="image/png" href="./img/ab2.png"> -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="description" content="Description">
+  <meta http-equiv="pragma" content="no-cache">
+  <meta http-equiv="cache-control" content="no-cache">
+  <meta http-equiv="expires" content="0">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <link href="./vue.themes.docsify.4.5.5.css" rel="stylesheet">
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    window.$docsify = {
+      homepage: 'index.md',
+      loadSidebar: true,
+      name: '轨迹树',
+
+      search: {
+        // maxAge: 86400000, // 过期时间，单位毫秒，默认一天
+        paths: 'auto',
+        placeholder: {
+          // '/en/': 'Search',
+          '/': '搜索',
+        },
+        noData: {
+          // '/en/': 'No Results',
+          '/': '找不到结果',
+        },
+      },
+
+       // load sidebar from _sidebar.md
+      loadSidebar: 'sidebar.md',
+      maxLevel: 4,
+      subMaxLevel: 3,
+      autoHeader: true,
+      auto2top: true,
+      mergeNavbar: true,
+      formatUpdated: '{YYYY}-{MM}-{DD} {HH}:{mm}:{ss}',
+    }
+    // if (typeof navigator.serviceWorker !== 'undefined') {
+    //     navigator.serviceWorker.register('serviceWorker.js')
+    // }
+  </script>
+  <script src="./docsify.4.5.5.min.js"></script>
+  <script src="./search.docsify.4.5.5.min.js"></script>
+</body>
+</html>
