@@ -1,2 +1,3 @@
-- [Python](Python)
-- [regex](regex)
+- [Python](python)
+- [Regex](regex)
+- [Linux](linux)
