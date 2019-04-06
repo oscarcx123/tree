@@ -1,4 +1,5 @@
 - [Python](python)
 - [PyQt5](pyqt5)
 - [Regex](regex)
+- [Windows](windows)
 - [Linux](linux)

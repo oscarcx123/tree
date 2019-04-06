@@ -39,7 +39,7 @@ pip install pyqt5-tools
 
 * Win+S呼出Cornata主面板（搜索框），输入designer，如果看到跟下图类似的结果说明PyQt Designer已经被安装
 
-![designer_install](./assets/img/pyqt5/designer_install_success.png)
+![designer_install](./assets/img/pyqt5/0x03/0x01/designer_install_success.png)
 
 * 在cmd中输入pyuic5，如果返回“Error: one input ui-file must be specified”说明安装成功。
 
@@ -51,11 +51,11 @@ pip install pyqt5-tools
 
 初次启动会弹出这个“New Form”窗口，一般来说选择“Main Window”然后点击“Create”就可以了。下方有个“Show this Dialogue on Startup”的checkbox，如果不想每次启动都看到这个“New Form”窗口，可以取消勾选。
 
-![new_form](./assets/img/pyqt5/new_form.png)
+![new_form](./assets/img/pyqt5/0x03/0x02/new_form.png)
 
 创建“Main Window”之后，我们会看到如下画面
 
-![designer_ui](./assets/img/pyqt5/designer_ui.png)
+![designer_ui](./assets/img/pyqt5/0x03/0x02/designer_ui.png)
 
 下面就来简单介绍下整个画面的构成：
 
@@ -73,17 +73,17 @@ pip install pyqt5-tools
 
 ## 0x03 HelloWorld!
 
+注：从这里开始，相关代码可以在/assets/code/pyqt5中找到
+
 通常来说，编写GUI有两种方法：第一种就是直接使用方便快捷的Qt Designer，第二种就是写代码。在有Qt Designer的情况下，是完全不推荐费时费力去手写GUI代码的。Qt Designer可以所见即所得，并且可以方便的修改并做出各种调整。
 
 按照惯例，我们先来实现一个能够显示HelloWorld的窗口。
-
-
 
 1）添加文本
 
 在左侧的“Widget Box”栏目中找到“Display Widgets”分类，将“Label”拖拽到屏幕中间的“MainWindow”画布上，你就获得了一个仅用于显示文字的文本框，如下图所示。
 
-![designer_create_label](./assets/img/pyqt5/designer_create_label.png)
+![designer_create_label](./assets/img/pyqt5/0x03/designer_create_label.png)
 
 2）编辑文本
 
@@ -91,13 +91,13 @@ pip install pyqt5-tools
 
 **特别提醒，编辑完文本之后记得敲击回车令其生效！**
 
-![designer_change_label_text](./assets/img/pyqt5/designer_change_label_text.png)
+![designer_change_label_text](./assets/img/pyqt5/0x03/designer_change_label_text.png)
 
 3）添加按钮
 
 使用同样的方法添加一个按钮（PushButton）并将其显示的文本改成“HelloWorld!”，如下图所示。
 
-![designer_create_pushbutton](./assets/img/pyqt5/designer_create_pushbutton.png)
+![designer_create_pushbutton](./assets/img/pyqt5/0x03/designer_create_pushbutton.png)
 
 4）修改窗口标题
 
@@ -105,15 +105,15 @@ pip install pyqt5-tools
 
 5）编辑菜单栏
 
-注意到画布的左上方有个“Type Here”，双击它即可开始编辑菜单栏。菜单栏支持创建多级菜单以及分割线（seperator）。我随意创建了一些菜单项目，如下图所示。
+注意到画布的左上方有个“Type Here”，双击它即可开始编辑菜单栏。菜单栏支持创建多级菜单以及分割线（separator）。我随意创建了一些菜单项目，如下图所示。
 
-![designer_create_menu](./assets/img/pyqt5/designer_create_menu.png)
+![designer_create_menu](./assets/img/pyqt5/0x03/designer_create_menu.png)
 
 6）预览
 
 使用快捷键Ctrl+R预览当前编写的GUI（或者从菜单栏的Form > Preview / Preview in进入）
 
-![designer_preview](./assets/img/pyqt5/designer_preview.png)
+![designer_preview](./assets/img/pyqt5/0x03/designer_preview.png)
 
 7）保存
 
@@ -129,7 +129,7 @@ pyuic5 -o name.py name.ui
 
 生成的代码应该类似下图所示
 
-![designer_code_helloworld](./assets/img/pyqt5/designer_code_helloworld.png)
+![designer_code_helloworld](./assets/img/pyqt5/0x03/designer_code_helloworld.png)
 
 9）运行Python代码
 
@@ -152,7 +152,7 @@ if __name__ == '__main__':
 
 然后运行“main.py”，你就能看到刚刚编写的GUI了！
 
-![designer_run_helloworld](./assets/img/pyqt5/designer_run_helloworld.png)
+![designer_run_helloworld](./assets/img/pyqt5/0x03/designer_run_helloworld.png)
 
 10）组件自适应
 
@@ -160,11 +160,11 @@ if __name__ == '__main__':
 
 点击画布空白处，然后在上方工具栏找到grid layout或者form layout，在本例中我们使用grid layout。两种layout的图标如下图所示。
 
-![designer_layout_helloworld](./assets/img/pyqt5/designer_layout_helloworld.png)
+![designer_layout_helloworld](./assets/img/pyqt5/0x03/designer_layout_helloworld.png)
 
 设置grid layout后，我们使用Ctrl+R预览，这次组件可以自适应了！因为我们已经将UI（HelloWorld.py/HelloWorld.ui）跟逻辑（main.py）分离，因此直接重复步骤7-8即可完成UI的更新，无需改动逻辑（main.py）部分。
 
-## 0x04 人机交互
+## 0x04 Interaction
 
 刚刚写的HelloWorld中，我们设置的按钮（PushButton）是没有实际作用的，因为我们并没有告诉这个按钮应该做什么。实际上，要让这个按钮做点什么只需要增加一行代码就可以了。
 
@@ -172,7 +172,7 @@ if __name__ == '__main__':
 
 打开HelloWorld.ui，在designer中选中对应的按钮，从“Property Editor”中可以得知这个按钮的“objectName”叫做“pushButton”，如下图所示。
 
-![designer_pushbutton_id](./assets/img/pyqt5/designer_pushbutton_id.png)
+![designer_pushbutton_id](./assets/img/pyqt5/0x04/designer_pushbutton_id.png)
 
 2）设置触发
 
@@ -201,30 +201,78 @@ def click_success():
 
 UI跟逻辑分离的好处就在这里，我们这次不用去管“HelloWorld.py”了，直接运行修改完的“main.py”。点击按钮，这次你会发现在控制台中有了我们预设的输出。
 
-最后附上此时main.py的代码
+## 0x05 Conversion
 
-```Python
-import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow
+这次我们来进行实战演练，编写一个带GUI的汇率转换器。
 
-import HelloWorld
+1）设计UI
 
-def click_success():
-    print("啊哈哈哈我终于成功了！")
+![conversion_ui](./assets/img/pyqt5/0x05/conversion_ui.png)
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    MainWindow = QMainWindow()
-    ui = HelloWorld.Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    ui.pushButton.clicked.connect(click_success)
-    sys.exit(app.exec_())
+通过上面的讲解，你应该能够毫无压力的设计上面这样的UI并获得对应的代码。如果不行，那么不建议继续往下阅读，应当回头复习。
+
+2）传参
+
+现在我们有了GUI的代码以及上一节中使用的“main.py”，我们可以开始编写这个汇率转换器的逻辑部分。
+
+在上一节，我们介绍了如何让按钮响应点击操作，但是并没有接受任何参数，而且只是在控制台输出。但是，上一节中说明了并不能通过正常的方式进行传参。因此，对于传参，有两种解决方案，一种是使用lambda，还有一种是使用functool.partial。在接下来的环节中我们会使用partial。
+
+partial的用法如下所示：
+
+```
+partial(function, arg1, arg2, ......)
 ```
 
-## 0x05 小结
+既然使用partial传参，那么我们就要在程序（main.py）的头部加上下面这行。
 
-本文只是抛砖引玉，上面这些只是PyQt5的入门内容。不过学会了按钮的交互方法，其它的也差不多能依葫芦画瓢做出来。
+```Python
+from functools import partial
+```
+
+然后我们把上一节中的按钮触发那行代码修改成下面这样。
+
+```Python
+ui.pushButton.clicked.connect(partial(convert, ui))
+```
+
+3）编写convert函数
+
+首先，我们要获取用户输入的数字。为了使得教程简洁易懂，我们这次只讲解单向的汇率转换。既然是单项的转换，那么我们只需要获取左侧的文本框id。在本例中，左侧的文本框id为lineEdit。如果你对此感到一头雾水，请停下并回头复习。
+
+获取文本使用的是text()方法，因此读取用户输入的代码如下
+
+```Python
+input = ui.lineEdit.text()
+```
+
+接着我们进行汇率转换，注意这里要进行类型转换
+
+```Python
+result = float(input) * 6.7
+```
+
+最后我们让右边的文本框显示结果
+
+```Python
+ui.lineEdit_2.setText(str(result))
+```
+
+下面是convert函数的代码
+
+```Python
+def convert(ui):
+    input = ui.lineEdit.text()
+    result = float(input) * 6.7
+    ui.lineEdit_2.setText(str(result))
+```
+
+一个简单的汇率转换器就这样诞生了！
+
+那么，如何知道一个组件都有什么方法呢？直接去[Qt官方文档](https://doc.qt.io/archives/qt-4.8/qtgui-module.html)查看就可以了。本节使用到的lineEdit的相关方法在[这里](https://doc.qt.io/archives/qt-4.8/qtextedit.html)
+
+## 0x0? 小结
+
+本文只是抛砖引玉，上面这些只是PyQt5的入门内容。不过学会了简单的交互方法，其它的也差不多能依葫芦画瓢做出来。
 
 本文中设计的程序在/assets/code/pyqt5中。
 
