@@ -162,6 +162,8 @@ if __name__ == '__main__':
 
 ![designer_layout_helloworld](./assets/img/pyqt5/0x03/designer_layout_helloworld.png)
 
+顺带一提，上图中layout的左边有三条横线以及三条竖线的图标，这两个是用于对齐组件，非常实用。
+
 设置grid layout后，我们使用Ctrl+R预览，这次组件可以自适应了！因为我们已经将UI（HelloWorld.py/HelloWorld.ui）跟逻辑（main.py）分离，因此直接重复步骤7-8即可完成UI的更新，无需改动逻辑（main.py）部分。
 
 ## 0x04 Interaction
