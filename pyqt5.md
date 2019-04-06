@@ -39,7 +39,7 @@ pip install pyqt5-tools
 
 * Win+S呼出Cornata主面板（搜索框），输入designer，如果看到跟下图类似的结果说明PyQt Designer已经被安装
 
-![designer_install](./assets/img/pyqt5/0x03/0x01/designer_install_success.png)
+![designer_install](./assets/img/pyqt5/0x01/designer_install_success.png)
 
 * 在cmd中输入pyuic5，如果返回“Error: one input ui-file must be specified”说明安装成功。
 
@@ -51,11 +51,11 @@ pip install pyqt5-tools
 
 初次启动会弹出这个“New Form”窗口，一般来说选择“Main Window”然后点击“Create”就可以了。下方有个“Show this Dialogue on Startup”的checkbox，如果不想每次启动都看到这个“New Form”窗口，可以取消勾选。
 
-![new_form](./assets/img/pyqt5/0x03/0x02/new_form.png)
+![new_form](./assets/img/pyqt5/0x02/new_form.png)
 
 创建“Main Window”之后，我们会看到如下画面
 
-![designer_ui](./assets/img/pyqt5/0x03/0x02/designer_ui.png)
+![designer_ui](./assets/img/pyqt5/0x02/designer_ui.png)
 
 下面就来简单介绍下整个画面的构成：
 
