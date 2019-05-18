@@ -104,7 +104,7 @@ sudo apt-get install fcitx-table
 
 3. 安装搜狗拼音
 
-访问(搜狗输入法For Linux)[https://pinyin.sogou.com/linux/?r=pinyin]，点击立即下载64bit，下载安装文件。
+访问[搜狗输入法For Linux](https://pinyin.sogou.com/linux/?r=pinyin)，点击立即下载64bit，下载安装文件。
 
 直接双击.deb文件安装，完成后重启Ubuntu。
 
@@ -136,7 +136,7 @@ https://blog.csdn.net/fx_yzjy101/article/details/80243710
 
 不要从Ubuntu软件中心安装snap软件包，软件中心的版本存在无法调出中文输入法（例如搜狗）输入中文的bug。
 
-解决方案：直接去(VSCode官网)[https://code.visualstudio.com/docs/setup/linux]下载“.deb package (64-bit)”。
+解决方案：直接去[VSCode官网](https://code.visualstudio.com/docs/setup/linux)下载“.deb package (64-bit)”。
 
 #### VSCode空格宽度非常小
 
