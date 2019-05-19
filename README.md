@@ -1,4 +1,4 @@
 # tree
-个人轨迹树
+个人学习笔记
 
-[个人轨迹树](https://oscarcx123.github.io/tree/)
+[个人学习笔记](https://oscarcx123.github.io/tree/)

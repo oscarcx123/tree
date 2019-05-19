@@ -293,3 +293,71 @@ env WINEPREFIX="$HOME/.deepinwine/Deepin-TIM" winecfg
 #### 设置默认缩放
 
 安装Default zoom插件。
+
+### Ubuntu & Windows 双系统时间问题
+
+#### 让Ubuntu禁用UTC（使用本地时间）
+
+1. **Ubuntu 16.04 之前**
+
+终端执行下面命令
+
+```bash
+sudo nano /etc/default/rcS
+```
+
+把utc=yes改成no
+
+2. **Ubuntu 16.04 之后**
+
+终端执行下面命令
+
+```bash
+timedatectl set-local-rtc 1 --adjust-system-clock
+```
+
+查看是否使用本地时间，可以在终端输入“timedatectl”
+
+要改回UTC，在终端输入
+
+```bash
+timedatectl set-local-rtc 0
+```
+
+#### 让Windows用UTC（不建议）
+
+在cmd中执行下面命令
+
+1. 32位Windows
+
+```cmd
+Reg add HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v RealTimeIsUniversal /t REG_DWORD /d 1
+```
+
+2. 64位Windows
+
+```cmd
+Reg add HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v RealTimeIsUniversal /t REG_QWORD /d 1
+```
+
+原文：[How to Fix Time Differences in Ubuntu 16.04 & Windows 10 Dual Boot](http://ubuntuhandbook.org/index.php/2016/05/time-differences-ubuntu-1604-windows-10/)
+
+### TLP
+
+TLP 提供优秀的 Linux 高级电源管理功能，而且开箱即用。
+
+英文简介：[ArchWiki - TLP](https://wiki.archlinux.org/index.php/TLP)
+
+#### 安装TLP
+
+```bash
+sudo apt-get install tlp
+```
+
+#### 安装TLPUI
+
+```bash
+sudo add-apt-repository ppa:linuxuprising/apps
+sudo apt update
+sudo apt install tlpui
+```
