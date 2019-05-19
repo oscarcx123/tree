@@ -112,6 +112,8 @@ sudo apt-get install fcitx-table
 
 4. 卸载iBus
 
+iBus还是要卸载的，倒不是因为两个输入法同时在右上角，而是因为搜狗输入法的“Shift键切换中英文”没法用。
+
 ```bash
 sudo apt-get purge ibus
 sudo apt-get autoremove
@@ -125,9 +127,19 @@ sudo apt-get install --reinstall ubuntu-desktop
 sudo apt-get install unity
 ```
 
+5. 疑难杂症
+
+Q: 搜狗输入法（fcitx）CPU占用100%，风扇狂转。在终端使用htop命令查看，具体表现为“/usr/bin/fcitx -d”占用率居高不下。
+
+A: 是搜狗云输入的锅，在fcitx配置里把搜狗云拼音这个选项去掉就行。具体操作为“Ubuntu右上角小键盘 > 配置 > 附加组件 > （勾选）高级 > 取消勾选搜狗云拼音”
+
+据说Google Pinyin也会有这个问题，解决方法跟这个完全相同。
+
 #### 原文链接
 
-https://blog.csdn.net/fx_yzjy101/article/details/80243710
+[安装部分主要来自这篇](https://blog.csdn.net/fx_yzjy101/article/details/80243710)
+
+[搜狗输入法100%CPU占用解决方法](https://blog.csdn.net/sunhaobo1996/article/details/80526140)
 
 
 ### VSCode
