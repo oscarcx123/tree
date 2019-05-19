@@ -155,3 +155,141 @@ A: 是搜狗云输入的锅，在fcitx配置里把搜狗云拼音这个选项去
 这个问题是Droid Sans Mono字体导致的。
 
 在设置里头找到“Editor: Font Family”，把monospace放在最前面即可。
+
+### Xfce
+
+#### 安装Xfce
+
+```bash
+sudo apt install xfce4
+```
+
+安装过程中会被要求选择登录管理器（Display Manager，显示管理器），一般是从gdm3和lightdm中选择一个，我选择了lightdm。
+
+安装完之后重启，在登录界面选择Xfce即可。
+
+#### 疑难杂症
+
+Q: Xfce在Ubuntu 19.04下无法打开默认应用（preferred applications），具体表现为点击桌面下方的终端、浏览器图标时弹出报错窗口，报错内容为“Failed to launch preferred application for category TerminalEmulator. Failed to execute child process /usr/lib/x86_64-linux-gnu/xfce4/exo-1/exo-helper-1 (No such file or directory).) Directory exo-1 does not exist.”
+
+A: 是bug，可以在[Debian bugs list](http://debian.2.n7.nabble.com/Bug-892010-exo-utils-exo-preferred-applications-does-not-run-with-error-quot-exo-helper-1-not-found--td4289016.html)找到，执行下面代码即可。
+
+```bash
+sudo apt install libexo-1-0
+```
+
+Q: 字体跟图标在高分屏下太小了
+
+A: 左上角所有应用程序 > 设置 > 设置管理器。
+
+找到面板，其中面板1是上面的任务栏，面板2是下面的快捷图标栏。我把面板1的“行大小”调成35像素。
+
+找到外观 > 字体 > DPI，自行调节至合适的大小，调节完后注销再登录即可见效。我把DPI改成了128。
+
+Q: 声音无法用键盘控制
+
+A: 右键单击上方任务栏 > 面板 > 添加新项目，找到PulseAudio插件，添加即可。
+
+Q: 亮度无法用键盘控制
+
+A: 终端执行下面代码
+
+```bash
+sudo apt-get install xfce4-battery-plugin
+```
+
+右键单击上方任务栏 > 面板 > 添加新项目，找到电量管理插件，添加即可。这个插件既能显示电量，还能控制亮度，所以原先的“电源监视器”插件可以换下来了。点击电池图标 > 电源管理器设置 可以开启电源管理。
+
+Q: Ctrl + Alt + T 不打开终端
+
+A: 左上角所有应用程序 > 设置 > 设置管理器 > 键盘 > 应用程序快捷键，点击添加。如果没看到添加按钮，最大化窗口即可。
+
+如果想继续用GNOME终端，在命令框输入“exo-open --launch TerminalEmulator”
+
+如果想用xfce的终端，在终端安装“xfce4-terminal”，然后在命令框输入“xfce4-terminal”
+
+最后，按下对应要设置的快捷键（Ctrl + Alt + T）即可
+
+### Deepin Wine
+
+#### winecfg
+
+需要安装wine
+
+官方源提供的wine是4.0版本，目前最新版是4.8，因此我们进行下面操作获取新版
+
+1. 添加wine的apt仓库
+
+```bash
+wget -nc https://dl.winehq.org/wine-builds/winehq.key && sudo apt-key add winehq.key
+```
+
+2. 添加Ubuntu 19.04的wine仓库
+
+```bash
+sudo apt-add-repository 'deb https://dl.winehq.org/wine-builds/ubuntu/ disco main'
+```
+
+注：如果不是Ubuntu 19.04，自行将上面disco替换掉，比如Ubuntu 18.04是bionic。
+
+3. 解决依赖libfaudio0
+
+wine开发版需要libfaudio0，但是Ubuntu仓库里头没有，因此添加下面这个第三方PPA
+
+```bash
+sudo add-apt-repository ppa:cybermax-dexter/sdl2-backport
+```
+
+4. 安装wine 4.8
+
+```bash
+sudo apt install --install-recommends winehq-devel
+```
+
+5. （以后）卸载
+
+```bash
+sudo apt remove --auto-remove winehq-devel
+```
+
+然后删除之前添加的源即可。
+
+原文：[How to Install Wine Devel 4.8 in Ubuntu 19.04 / 18.04](http://ubuntuhandbook.org/index.php/2019/05/nstall-wine-4-8-ubuntu-19-04-18-04/)
+
+#### TIM在Ubuntu 19.04 & GNOME 3.32下不显示最小化托盘
+
+1. 在火狐浏览器安装GNOME Shell integration插件
+
+2. 终端运行
+
+```bash
+sudo apt-get install chrome-gnome-shell
+```
+
+不安装会导致插件报错，报错内容为“Unable to locate GNOME Shell settings or version. Make sure it is installed and running.”
+
+3. 找到[topicons插件](https://extensions.gnome.org/extension/1031/topicons/)，虽然Ubuntu 19.04用的的GNOME 3.32，我们在这里的“Shell Version”选择3.30就可以，“Extension Version”选择22。安装完重启即可。
+
+#### TIM字体太小
+
+1. 先退出deepin-tim或deepin-qq，否则会提示错误。
+
+2. 终端运行下面代码
+
+```bash
+env WINEPREFIX="$HOME/.deepinwine/Deepin-TIM" winecfg
+```
+
+如果是修改QQ界面字体大小，就把Deepin-TIM改成Deepin-QQ。
+
+如果没有winecfg，先安装wine。
+
+3. wine设置的显示 > 屏幕分辨率，然后将屏幕分辨率拖放到合适的大小。
+
+原文：[Deepin-TIM或Deepin-QQ调整界面DPI字体大小的方法](https://www.lulinux.com/archives/4642)
+
+### Firefox
+
+#### 设置默认缩放
+
+安装Default zoom插件。
