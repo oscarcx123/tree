@@ -361,3 +361,59 @@ sudo add-apt-repository ppa:linuxuprising/apps
 sudo apt update
 sudo apt install tlpui
 ```
+
+### tar
+
+Linux下经常会见到各种tar.xx的压缩包，tar是打包的格式，后面那个才是压缩的方式。
+
+#### 解压
+
+对于这种形式的压缩包，其实直接一句命令就可以通吃了。
+
+```bash
+tar xf filename.tar.xx
+```
+
+搜索一番得知，从1.15起tar就可以自动识别压缩的格式，因此无需输入“-z”等参数来指定压缩格式。
+
+“-v”参数其实也可以省略，因为详细信息刷刷刷的过，用处好像也不是很大。
+
+实际上“-”本身也可以省略，因为这些“参数”都是必要的，如果没有参数，单纯使用“tar”是不行的。
+
+从man里头节选部分命令翻译如下：
+
+-x, --extract, --get 解压
+
+-f, --file=ARCHIVE 要处理的压缩包名
+
+#### 打包
+
+如果只是打包的话，那么利用下面这个命令即可（打包当前目录下所有文件到pack.tar）。
+
+```bash
+tar cf pack.tar *
+```
+
+从man里头节选部分命令翻译如下：
+
+-c, --create 创建新的包
+
+-r, --append 在已有包的尾部追加文件
+
+-t, --list 列出包中的文件
+
+-u, --update 更新文件（新文件不会取代旧文件，而是被追加到包的尾部，此时包中存在不同版本的同名文件）
+
+#### 压缩
+
+压缩就是在打包基础上增加一个指定压缩方法的参数
+
+-a, --auto-compress （根据用户给定的后缀名来压缩，懒人专用）
+
+-j, --bzip2
+
+-J, --xz
+
+-z, --gzip, --gunzip, --ungzip
+
+-Z, --compress, --uncompress
