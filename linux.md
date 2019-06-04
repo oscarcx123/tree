@@ -1,3 +1,21 @@
+### 好用的命令
+
+#### tldr
+
+精简实用版的man，懒人专属
+
+```bash
+sudo apt-get install tldr
+```
+
+#### thefuck
+
+自动纠正终端命令错误
+
+```bash
+sudo pip3 install thefuck
+```
+
 ### 后台挂起任务
 
 ```bash
@@ -388,7 +406,7 @@ tar xf filename.tar.xx
 
 #### 打包
 
-如果只是打包的话，那么利用下面这个命令即可（打包当前目录下所有文件到pack.tar）。
+如果只是打包的话，那么利用下面这个命令即可（打包当前目录下所有文件到pack.tar，星号可以自行替换成需要打包的内容）。
 
 ```bash
 tar cf pack.tar *
@@ -417,3 +435,80 @@ tar cf pack.tar *
 -z, --gzip, --gunzip, --ungzip
 
 -Z, --compress, --uncompress
+
+### Apache2
+
+#### 给目录加密码
+
+1. 在希望加密的目录下创建 .htaccess 文件，内容如下
+
+```bash
+AuthName 'blablabla' # 这里填验证说明
+AuthType Basic
+AuthUserFile /path/.htpasswd # 这里是密码文件的路径，根据你的实际位置填写
+require valid-user
+```
+
+2. 然后到你希望存放 .htpasswd 文件的目录下，输入如下命令
+
+```bash
+htpasswd -c .htpasswd [username] # 填上用户名
+```
+
+3. 开启 .htaccess 功能
+
+打开Apache2配置文件（此处为Ubuntu 16.04的配置文件路径）
+
+```bash
+sudo nano /etc/apache2/apache2.conf
+```
+
+找到“<Directory "/var/www">”，将其下方的AllowOverride None改为AllowOverride All。
+
+最后重启Apache2
+
+```bash
+sudo service apache2 restart
+```
+
+### aria2
+
+#### 基础用法
+
+普通下载
+
+```bash
+aria2c [target]
+```
+
+多线程下载
+
+```bash
+aria2c -s 16 -x 16 [target]
+```
+
+下载多个文件
+
+```bash
+aria2c [target1] [target2]
+```
+
+从文件中读取全部下载url，并下载
+
+```bash
+aria2c -i [filename]
+```
+
+进行限速
+
+```bash
+aria2c --max-download-limit=[SPEED] [target]
+```
+
+* SPEED的单位是B/s
+
+带Auth下载文件（例如Apache加密目录）
+
+```bash
+aria2c http://[username]:[password]@[ip(url)]
+```
