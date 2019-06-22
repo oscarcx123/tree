@@ -83,6 +83,12 @@ dd bs=4M if=/dev/urandom of=/dev/sda
 sudo visudo
 ```
 
+如果默认打开的是vi，那可以使用下面指令指定编辑器为nano
+
+```bash
+sudo EDITOR=/usr/bin/nano visudo
+```
+
 2. 在/etc/sudoers文件的尾部，加上下面这行
 
 ```bash
