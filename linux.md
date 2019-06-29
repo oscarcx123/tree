@@ -312,6 +312,38 @@ env WINEPREFIX="$HOME/.deepinwine/Deepin-TIM" winecfg
 
 原文：[Deepin-TIM或Deepin-QQ调整界面DPI字体大小的方法](https://www.lulinux.com/archives/4642)
 
+#### Xfce + deepin-wine （QQ / 微信）无法用搜狗输入法打中文
+
+通过pacman或者aur源安装好QQ和微信后无法输入中文, 解决方法如下：
+
+1. 分别找到如下路径中的run.sh文件
+
+/opt/deepinwine/apps/Deepin-WeChat
+
+/opt/deepinwine/apps/Deepin-TIM
+
+2. run.sh文件头部（注释后面）的变量中下面添加如下代码
+
+```bash
+export GTK_IM_MODULE=fcitx
+export QT_IM_MODULE=fcitx
+export XMODIFIERS="@im=fcitx"
+```
+
+修改完之后，文件应当如下所示
+
+```bash
+WINEPREFIX="$HOME/.deepinwine/Deepin-TIM"
+APPDIR="/opt/deepinwine/apps/Deepin-TIM"
+APPVER="2.3.2.21158"
+APPTAR="files.7z"
+PACKAGENAME="com.qq.tim"
+WINE_CMD="wine"
+export GTK_IM_MODULE=fcitx
+export QT_IM_MODULE=fcitx
+export XMODIFIERS="@im=fcitx"
+```
+
 ### Firefox
 
 #### 设置默认缩放
