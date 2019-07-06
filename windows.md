@@ -35,3 +35,14 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\LibraryFolder\background\shell\OpenCmdHere\command]
 @="cmd.exe /s /k pushd \"%V\""
 ```
+
+### Windows10 家庭版开启组策略
+
+将下面内容粘贴到空文本文档，后缀名改为bat，管理员权限运行即可
+
+```cmd
+pushd "%~dp0"
+dir /b C:\Windows\servicing\Packages\Microsoft-Windows-GroupPolicy-ClientExtensions-Package~3*.mum >List.txt
+dir /b C:\Windows\servicing\Packages\Microsoft-Windows-GroupPolicy-ClientTools-Package~3*.mum >>List.txt
+for /f %%i in ('findstr /i . List.txt 2^>nul') do dism /online /norestart /add-package:"C:\Windows\servicing\Packages\%%i"
+```
