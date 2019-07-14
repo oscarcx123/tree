@@ -550,3 +550,20 @@ aria2c --max-download-limit=[SPEED] [target]
 ```bash
 aria2c http://[username]:[password]@[ip(url)]
 ```
+
+### 配置JAVA环境变量
+
+使用下面命令打开profile文件
+
+```bash
+sudo nano /etc/profile
+```
+
+在profile末尾根据实际情况加上下面内容
+
+```bash
+export JAVA_HOME="/usr/lib/jvm/java-12-openjdk"
+export PATH=$JAVA_HOME/bin:$PATH
+```
+
+如果出现“The JAVA_HOME environment variable points to a missing or inaccessible folder (/usr/lib/jvm/java-11-openjdk)”，请检查路径是否错误。我这次升级到java-12-openjdk之后，就需要手动修改$JAVA_HOME。
