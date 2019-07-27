@@ -71,3 +71,17 @@ End Sub
 3. 在“指定命令” > “类别”中选中“宏”
 
 4. 在右侧找到刚刚保存的宏，并在下方“请按新快捷键”处指定热键
+
+### Windows 10 无法使用搜索栏，显示一片空白
+
+用管理员身份运行CMD，输入：
+
+```cmd
+start powershell
+```
+
+输入后打开了Windows PowerShell，在WindowsPowerShell中输入：
+
+```cmd
+Get-AppXPackage -Name Microsoft.Windows.Cortana | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
+```
