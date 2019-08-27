@@ -567,3 +567,55 @@ export PATH=$JAVA_HOME/bin:$PATH
 ```
 
 如果出现“The JAVA_HOME environment variable points to a missing or inaccessible folder (/usr/lib/jvm/java-11-openjdk)”，请检查路径是否错误。我这次升级到java-12-openjdk之后，就需要手动修改$JAVA_HOME。
+
+
+### Manjaro 更新软件包错误
+
+```bash
+sudo pacman -Syu
+```
+
+输入上面命令，在检查文件冲突之后，会出现如下或类似错误
+
+```bash
+(150/150) 正在检查密钥环里的密钥                                             [###########################################] 100%
+(150/150) 正在检查软件包完整性                                               [###########################################] 100%
+(150/150) 正在加载软件包文件                                                 [###########################################] 100%
+(150/150) 正在检查文件冲突                                                   [###########################################] 100%
+错误：无法提交处理 (有冲突的文件)
+python-attrs: 文件系统中已存在 /usr/lib/python3.7/site-packages/attr/__init__.py 
+python-attrs: 文件系统中已存在 /usr/lib/python3.7/site-packages/attr/__init__.pyi 
+python-attrs: 文件系统中已存在 /usr/lib/python3.7/site-packages/attr/__pycache__/__init__.cpython-37.pyc 
+python-attrs: 文件系统中已存在 /usr/lib/python3.7/site-packages/attr/__pycache__/_compat.cpython-37.pyc 
+python-attrs: 文件系统中已存在 /usr/lib/python3.7/site-packages/attr/__pycache__/_config.cpython-37.pyc 
+python-attrs: 文件系统中已存在 /usr/lib/python3.7/site-packages/attr/__pycache__/_funcs.cpython-37.pyc 
+python-attrs: 文件系统中已存在 /usr/lib/python3.7/site-packages/attr/__pycache__/_make.cpython-37.pyc 
+python-attrs: 文件系统中已存在 /usr/lib/python3.7/site-packages/attr/__pycache__/converters.cpython-37.pyc 
+python-attrs: 文件系统中已存在 /usr/lib/python3.7/site-packages/attr/__pycache__/exceptions.cpython-37.pyc 
+python-attrs: 文件系统中已存在 /usr/lib/python3.7/site-packages/attr/__pycache__/filters.cpython-37.pyc 
+python-attrs: 文件系统中已存在 /usr/lib/python3.7/site-packages/attr/__pycache__/validators.cpython-37.pyc 
+python-attrs: 文件系统中已存在 /usr/lib/python3.7/site-packages/attr/_compat.py 
+python-attrs: 文件系统中已存在 /usr/lib/python3.7/site-packages/attr/_config.py 
+python-attrs: 文件系统中已存在 /usr/lib/python3.7/site-packages/attr/_funcs.py 
+python-attrs: 文件系统中已存在 /usr/lib/python3.7/site-packages/attr/_make.py 
+python-attrs: 文件系统中已存在 /usr/lib/python3.7/site-packages/attr/converters.py 
+python-attrs: 文件系统中已存在 /usr/lib/python3.7/site-packages/attr/converters.pyi 
+python-attrs: 文件系统中已存在 /usr/lib/python3.7/site-packages/attr/exceptions.py 
+python-attrs: 文件系统中已存在 /usr/lib/python3.7/site-packages/attr/exceptions.pyi 
+python-attrs: 文件系统中已存在 /usr/lib/python3.7/site-packages/attr/filters.py 
+python-attrs: 文件系统中已存在 /usr/lib/python3.7/site-packages/attr/filters.pyi 
+python-attrs: 文件系统中已存在 /usr/lib/python3.7/site-packages/attr/py.typed 
+python-attrs: 文件系统中已存在 /usr/lib/python3.7/site-packages/attr/validators.py 
+python-attrs: 文件系统中已存在 /usr/lib/python3.7/site-packages/attr/validators.pyi 
+发生错误，没有软件包被更新。
+```
+
+经过一番搜索，发现罪魁祸首是不知道什么时候安装到电脑上的Python包，叫attrs。
+
+解决方法如下：
+
+```bash
+sudo pip uninstall attrs
+```
+
+然后重新执行“sudo pacman -Syu”即可。
