@@ -551,6 +551,8 @@ aria2c --max-download-limit=[SPEED] [target]
 aria2c http://[username]:[password]@[ip(url)]
 ```
 
+注： -s specifies the global connection limit; the per-host connection limit is specified with -x.
+
 ### 配置JAVA环境变量
 
 使用下面命令打开profile文件
