@@ -548,3 +548,263 @@ jarsigner -verbose -keystore myKeyStore -signedjar frog_104_signed.apk frog_104.
 ](https://stackoverflow.com/questions/47095088/signapk-jar-giving-error-java-lang-classnotfoundexception-sun-misc-base64encode/47139732)
 
 * [用jarsigner对android apk进行签名](https://blog.51cto.com/sunzeduo/1438368)
+
+## 0x02 旅行青蛙 v1.6.2 (2019/09/03)
+
+虽然还是旅行青蛙，但是这次要攻克的是它的最新版本 v1.6.2（于2019-06-24发布）。显然，这次难度会比上次要大一些。
+
+0. 获取旅行青蛙1.6.2版本
+
+网上一搜一大把，我下载之后重命名为`frog_162.apk`
+
+1. 首先将apk用`apktool`进行反编译
+
+```cmd
+java -jar apktool.jar d frog_162.apk
+```
+
+2. 找到Assembly-CSharp.dll
+
+嗯？这次在`assets/bin/Data/Managed`下面怎么没找到`Assembly-CSharp.dll`？
+
+因为之前也看过一些逆向文章，很快就认出这个是IL2cpp打包过的游戏。
+
+IL2cpp打包特征有两个：
+
+* 在`assets/bin/Data/Managed/Metadata`下面找到`global-metadata.dat`。
+* 在`lib/arm64-v8a`下面找到`libil2cpp.so`。除了`arm64-v8a`还可以是`armeabi-v7a`，`x86`等等。
+
+3. 使用Il2CppDumper还原信息
+
+双击运行Il2CppDumper.exe程序，先选择`libil2cpp.so`文件，再选择`global-metadata.dat`文件。
+
+Unity版本写`2018.3`，选择模式3，如下所示。
+
+```cmd
+Input Unity version:
+2018.3
+Initializing metadata...
+Select Mode: 1.Manual 2.Auto 3.Auto(Plus) 4.Auto(Symbol)
+Initializing il2cpp file...
+Applying relocations...
+Searching...
+CodeRegistration : ea5158
+MetadataRegistration : ea51c8
+Dumping...
+Done !
+Create DummyDll...
+Done !
+Press any key to exit...
+```
+
+在同一个目录下会生成`DummyDll`这个文件夹，以及`dump.cs`和`script.py`两个文件。
+
+4. 用IDA打开`libil2cpp.so`文件
+
+这个没啥好说，就是在打开文件之后记得加载（File > Script File）`script.py`。IDA分析需要一段时间，所以就先让它挂着跑，我去干别的。
+
+5. 使用文本编辑器打开`dump.cs`
+
+这里不使用dnSpy反编译找到的C#脚本，因为这些脚本实际上没啥用。
+
+然后就开始搜索关键词了，实际上为了效率我们可以利用前面1.0.4版本的未加密C#脚本来搜寻目标，但是现在是学习钻研逆向，当然不能偷懒。
+
+这里我们想修改三叶草的数量，那就搜索关键词`clover`，翻一翻就会发现有个方法叫做`getCloverPoint`，下面内容节选自`dump.cs`
+
+```csharp
+public static DateTime Get_LoadDeviceTime(); // RVA: 0x49C504 Offset: 0x49C504
+public static DateTime GetLastDateTime(); // RVA: 0x49C724 Offset: 0x49C724
+public static float getGameTimer(); // RVA: 0x49C870 Offset: 0x49C870
+public static Scenes GetNowScenes(); // RVA: 0x49C8D8 Offset: 0x49C8D8
+public static void setNextScene(Scenes _NextScene); // RVA: 0x499B2C Offset: 0x499B2C
+public static void SetStartScene(Scenes setScene); // RVA: 0x49C940 Offset: 0x49C940
+public static bool GetIAPCallBackCntEnable(); // RVA: 0x49C9AC Offset: 0x49C9AC
+public static void IAPCallBackCntReset(); // RVA: 0x49CA2C Offset: 0x49CA2C
+public static void IAPCallBackCntUse(); // RVA: 0x49CAA8 Offset: 0x49CAA8
+public static void MathTime_Clover(int addTimer); // RVA: 0x49CB40 Offset: 0x49CB40
+public static List`1<CloverDataFormat> GetCloverList(); // RVA: 0x49D184 Offset: 0x49D184
+public static void SaveCloverList(List`1<CloverDataFormat> cloverList); // RVA: 0x49D36C Offset: 0x49D36C
+public static void getCloverPoint(int num); // RVA: 0x49D534 Offset: 0x49D534
+public static int CloverPointStock(); // RVA: 0x49ADC0 Offset: 0x49ADC0
+public static int TicketStock(); // RVA: 0x49AEB0 Offset: 0x49AEB0
+public static void GetTicket(int getTicket); // RVA: 0x49D99C Offset: 0x49D99C
+public static int GetTmpRaffleResult(); // RVA: 0x49DB24 Offset: 0x49DB24
+public static void SetTmpRaffleResult(int _val); // RVA: 0x49DB9C Offset: 0x49DB9C
+public static int CouponStock(); // RVA: 0x49AE38 Offset: 0x49AE38
+public static void GetCoupon(int getCoupon); // RVA: 0x49DC18 Offset: 0x49DC18
+public static int RequestCountStock(); // RVA: 0x49DDA4 Offset: 0x49DDA4
+```
+
+之前我的方向就出现了错误。我选择了`CloverPointStock()`这个方法来修改，但是后来却发现特别难弄。道理就是修改这个函数的返回值为一个固定数值，我感觉思路是对的，但是改了几次都没有成功，估计是技术还不过关吧，于是果断放弃，选择了后来证明可行的办法。
+
+因此，我们要的就是下面这一行。
+
+```csharp
+public static void getCloverPoint(int num); // RVA: 0x49D534 Offset: 0x49D534
+```
+
+Offset要记下来，下面要用到。
+
+6. 在IDA中定位对应代码
+
+在IDA中按G键（或者Jump > Jump to address），然后输入刚才得到的Offset（本例中就是0x49D534），就可以定位到代码了。
+
+此时我们看到下面内容（这里节选一段）
+
+```assembly
+; Attributes: bp-based frame
+
+SuperGameMaster$$getCloverPoint
+
+var_20= -0x20
+var_10= -0x10
+var_s0=  0
+
+; __unwind {
+STP             X22, X21, [SP,#-0x10+var_20]!
+STP             X20, X19, [SP,#0x20+var_10]
+STP             X29, X30, [SP,#0x20+var_s0]
+ADD             X29, SP, #0x20
+ADRP            X20, #byte_F48D6A@PAGE
+LDRB            W8, [X20,#byte_F48D6A@PAGEOFF]
+MOV             W19, W0
+TBNZ            W8, #0, loc_49D56C
+```
+
+其实里头说了啥，现在不用太关心，我们需要看看这个方法是被谁调用了。
+
+使用快捷键`Ctrl+X`可以查看那些地方调用了`getCloverPoint`这个方法。果不其然，我们找到了一个叫`DisplayPanel$$BuyItem`的方法，点进去看看。
+
+```assembly
+loc_5DA8C0
+LDR             W8, [X20,#0x34]
+MOV             X1, XZR
+NEG             W0, W8
+BL              SuperGameMaster$$getCloverPoint
+LDR             W0, [X21,#0x10]
+MOV             W1, #1
+MOV             X2, XZR
+BL              SuperGameMaster$$GetItem
+ADRP            X28, #off_EBE6A0@PAGE
+LDR             X28, [X28,#off_EBE6A0@PAGEOFF]
+MOV             X0, X19
+LDR             X1, [X28]
+BL              Component$$GetComponentInParent_10897408
+MOV             X21, X0
+CBNZ            X21, loc_5DA900
+```
+
+在调用方法之前，这里有一个NEG操作。这句的意思就是把W8 * (-1)，然后赋值给W0，其实就是说W0就是W8的相反数。结合方法名称叫做`getCloverPoint`，我们可以大胆推测，买东西的时候就是“获取负数量的三叶草”。
+
+```assembly
+NEG             W0, W8
+```
+
+为了证实猜想，我们进去另一个调用了`getCloverPoint`的方法看看。我选择了`IAPPanel$$IAP_Complete`，因为一看就知道这个方法就是内购完成后进行的操作。代码如下。显而易见这里所使用的就是`MOV W0, W22`了。
+
+```assembly
+loc_51B294
+MOV             W0, W22
+MOV             X1, XZR
+BL              SuperGameMaster$$getCloverPoint
+CBZ             X21, loc_51B2B8
+```
+
+那么目标很明确了，就是把刚刚那个NEG改成MOV，这样就是把每次购买时的商品价格直接加到玩家的三叶草上。
+
+注：最后跟1.0.4的C#代码作比较，再次证实了猜想的正确性。
+
+附上对应的C#代码
+
+```csharp
+public static void getCloverPoint(int num)
+{
+	SuperGameMaster.saveData.CloverPoint += num;
+	if (num > 0)
+	{
+		SuperGameMaster.set_FlagAdd(Flag.Type.CLOVER_NUM, num);
+	}
+}
+```
+
+```csharp
+public void BuyItem()
+{
+	ShopDataFormat shopDataFormat = SuperGameMaster.sDataBase.get_ShopDB(this.selectShopIndex);
+	ItemDataFormat itemDataFormat = SuperGameMaster.sDataBase.get_ItemDB_forId(shopDataFormat.itemId);
+	SuperGameMaster.getCloverPoint(-itemDataFormat.price);
+	SuperGameMaster.GetItem(shopDataFormat.itemId, 1);
+	base.GetComponentInParent<UIMaster>().OnSave();
+	//以下略
+```
+
+```csharp
+public void IAP_Complete(int getId)
+	{
+		int num = 0;
+		switch (getId)
+		{
+		case 1:
+			num = 400;
+			break;
+		case 2:
+			num = 1000;
+			break;
+		case 3:
+			num = 1800;
+			break;
+		case 4:
+			num = 2800;
+			break;
+		}
+		SuperGameMaster.getCloverPoint(num);
+	        //以下略
+```
+
+7. 把目标代码转换成hex
+
+```assembly
+MOV             W0, W8
+```
+
+随手一搜就有“Online ARM To Hex Converter”，那就再好不过了，直接丢进去转换即可，转换结果是`E003082A`。
+
+8. 替换原有hex
+
+回到IDA，鼠标选中需要修改的那行代码，在下面就能看到代码位置，我这里显示的是005DA8C8。
+
+使用Hxd打开`libil2cpp.so`文件，`Ctrl+G`或者搜索 > 跳转，然后输入刚刚获取的位置信息（005DA8C8）。
+
+在此处你应该能看到`E0 03 08 4B`，对了，这个就是`NEG W0, W8`。
+
+我们把光标移动到`E0 03 08 4B`的头部（E前面），然后直接输入`E003082A`即可，输入的时候会自动覆盖掉原来的内容。改完记得保存。
+
+9. 打包 & 签名
+
+清理掉一些不必要的文件，例如IDA生成的文件，hxd生成的bak文件等等。
+
+然后打包签名。
+
+```cmd
+java -jar apktool.jar b ./frog_104
+```
+
+```cmd
+jarsigner -verbose -keystore myKeyStore -signedjar frog_104_signed.apk frog_104.apk myKeyStore
+```
+
+安装APP，在进行新手教程的时候会需要买东西，此时三叶草不减反增，证明逆向成功！
+
+12. 收获
+
+这次花的时间稍微长一些，研究学习了从汇编码层面来修改逻辑。
+
+13. 参考链接
+
+* [记录一次Unity3d-il2cpp游戏修改](https://www.52pojie.cn/thread-982655-1-1.html)
+
+* [Keil-Search](https://developer.arm.com/keil-search)
+
+* [ARM汇编之解惑条件标志，条件码，条件执行](https://www.jianshu.com/p/0c6192da2fd0)
+
+* [ARM汇编指令(ARM寻址方式、汇编指令、伪指令)](https://blog.csdn.net/cwcwj3069/article/details/7948078)
