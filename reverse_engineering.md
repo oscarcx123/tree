@@ -808,3 +808,112 @@ jarsigner -verbose -keystore myKeyStore -signedjar frog_162_signed.apk frog_162.
 * [ARM汇编之解惑条件标志，条件码，条件执行](https://www.jianshu.com/p/0c6192da2fd0)
 
 * [ARM汇编指令(ARM寻址方式、汇编指令、伪指令)](https://blog.csdn.net/cwcwj3069/article/details/7948078)
+
+## 0x03 神庙逃亡 v1.9.6 (2019/09/03)
+
+本来想尝试逆向神庙逃亡最新版的，无奈从v1.10.0开始就对游戏进行了加密，因此挑选最后一个无加密的版本进行练习。
+
+0. 获取神庙逃亡v1.9.6版本
+
+网上一搜一大把，我下载之后重命名为`temple_196.apk`。
+
+还是先进行如下常规步骤。
+
+1. 首先将apk用`apktool`进行反编译
+
+2. 找到Assembly-CSharp.dll
+
+3. 使用dnSpy反编译找到的C#脚本
+
+4. 寻找目标
+
+这里搜索了`Buy`，然后发现了一个叫`BuyItem`的方法。
+
+```csharp
+private void BuyItem()
+	{
+		int num = this.RecordManager.GetCoinCount(this.PlayerManager.GetActivePlayer());
+		if (this.Price <= num)
+		{
+			num -= this.Price;
+			this.RecordManager.SetCoinCount(this.PlayerManager.GetActivePlayer(), num);
+			if (this.Type == RecordManager.StoreItemType.kStoreItemDisableAds)
+			{
+			}
+			int playerLevelForUpgradeType = this.RecordManager.GetPlayerLevelForUpgradeType(this.PlayerManager.GetActivePlayer(), this.Type);
+			if ((this.Type == RecordManager.StoreItemType.kStoreItemCoinBonus || this.Type == RecordManager.StoreItemType.kStoreItemVacuum || this.Type == RecordManager.StoreItemType.kStoreItemInvincibility || this.Type == RecordManager.StoreItemType.kStoreItemBoost) && playerLevelForUpgradeType >= 7)
+			{
+				this.RecordManager.SetPlayerLevelForUpgradeType(this.PlayerManager.GetActivePlayer(), this.Type, 6);
+			}
+			else
+			{
+				this.RecordManager.SetPlayerLevelForUpgradeType(this.PlayerManager.GetActivePlayer(), this.Type, playerLevelForUpgradeType + 1);
+			}
+			base.SendMessageUpwards("AdjustCoins");
+			this.RecordManager.SaveRecords();
+			this.Reconfigure();
+			AudioManager.Instance.PlayFX(AudioManager.Effects.cashRegister, 1f);
+			if (this.Type == RecordManager.StoreItemType.kStoreItemAngelWings && playerLevelForUpgradeType == 0)
+			{
+				this.AlertView.ShowAlert(Strings.Txt("StoreItemResurrectionWingsPopupTitle"), Strings.Txt("StoreItemResurrectionWingsPopupText"), Strings.Txt("Ok"), null);
+			}
+			if (this.Type == RecordManager.StoreItemType.kStoreItemPermaWings && playerLevelForUpgradeType == 0)
+			{
+				this.AlertView.ShowAlert(Strings.Txt("StoreItemPermaWingsPopupTitle"), Strings.Txt("StoreItemPermaWingsPopupText"), Strings.Txt("Ok"), null);
+			}
+			if (this.Type == RecordManager.StoreItemType.kStoreItemHeadStart && playerLevelForUpgradeType == 0)
+			{
+				this.AlertView.ShowAlert(Strings.Txt("StoreItemHeadStartPopupTitle"), Strings.Txt("StoreItemHeadStartPopupText"), Strings.Txt("Ok"), null);
+			}
+			if (this.Type == RecordManager.StoreItemType.kStoreItemHeadStartMega && playerLevelForUpgradeType == 0)
+			{
+				this.AlertView.ShowAlert(Strings.Txt("StoreItemHeadStartMegaPopupTitle"), Strings.Txt("StoreItemHeadStartMegaPopupText"), Strings.Txt("Ok"), null);
+			}
+			if (this.Class == StoreItem.StoreItemClass.Character)
+			{
+				this.ActivateCharacter(this.Type);
+			}
+			if (this.Class == StoreItem.StoreItemClass.Wallpaper)
+			{
+				this.GrabWallpaper(this.Type);
+			}
+		}
+		else
+		{
+			this.AlertView.ShowAlert(Strings.Txt("StoreItemNotEnoughCoinsTitle"), Strings.Txt("StoreItemNotEnoughCoinsText"), Strings.Txt("No"), Strings.Txt("Yes"), null, delegate()
+			{
+				StoreGUI.Instance.HideAll();
+				VCGUI.Instance.SlideIn(StoreGUI.Instance);
+			});
+		}
+	}
+```
+
+关键在这一小段。游戏使用GetCoinCount方法获取金币数量，然后跟价格作比较，如果金币大于等于价格就扣除。这里有很多思路，比如可以把扣钱改成加钱，我这里走的是修改获取金币的方法的返回值的路线。
+
+```csharp
+int num = this.RecordManager.GetCoinCount(this.PlayerManager.GetActivePlayer());
+		if (this.Price <= num)
+		{
+			num -= this.Price;
+```
+
+那就跟进去GetCoinCount方法看看。
+
+```csharp
+public int GetCoinCount(int playerId)
+	{
+		RecordManager.cPlayerRecord cPlayerRecord = this.FindPlayerRecord(playerId);
+		return (cPlayerRecord == null) ? 0 : cPlayerRecord.coinCount;
+	}
+```
+
+这里很明显了，直接把`return (cPlayerRecord == null) ? 0 : cPlayerRecord.coinCount;`替换成`return 99999;`即可。
+
+点击需要修改的那行代码，右键编辑IL指令，然后直接删除高亮指令（就是选中的代码），新建指令`idc.i4 99999`和`ret`。
+
+5. 保存，签名，打包，真机测试成功。
+
+6. 收获
+
+这次花的时间就非常短了，有了之前的经验，这次可以很快定位到目标并且完成修改。其实除了修改金币，还可以尝试修改别的东西，比如各种道具效果。
