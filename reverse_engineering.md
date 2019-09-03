@@ -790,7 +790,7 @@ java -jar apktool.jar b ./frog_104
 ```
 
 ```cmd
-jarsigner -verbose -keystore myKeyStore -signedjar frog_104_signed.apk frog_104.apk myKeyStore
+jarsigner -verbose -keystore myKeyStore -signedjar frog_162_signed.apk frog_162.apk myKeyStore
 ```
 
 安装APP，在进行新手教程的时候会需要买东西，此时三叶草不减反增，证明逆向成功！
