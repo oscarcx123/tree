@@ -537,3 +537,14 @@ jarsigner -verbose -keystore myKeyStore -signedjar frog_104_signed.apk frog_104.
 12. 收获
 
 通过这次简单的逆向之旅，我初步了解了简易的逆向过程以及逆向工具的使用。
+
+13. 参考链接
+
+* [旅行的青蛙Unity游戏逆向修改--Android篇](http://www.alonemonkey.com/2018/02/02/unity-reverse-android/)
+
+* [简单Unity3D类安卓游戏逆向思路](https://blog.csdn.net/weixin_44058342/article/details/87940908)
+
+* [Signapk.jar giving error java.lang.ClassNotFoundException: sun.misc.BASE64Encoder
+](https://stackoverflow.com/questions/47095088/signapk-jar-giving-error-java-lang-classnotfoundexception-sun-misc-base64encode/47139732)
+
+* [用jarsigner对android apk进行签名](https://blog.51cto.com/sunzeduo/1438368)
