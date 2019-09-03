@@ -917,3 +917,57 @@ public int GetCoinCount(int playerId)
 6. 收获
 
 这次花的时间就非常短了，有了之前的经验，这次可以很快定位到目标并且完成修改。其实除了修改金币，还可以尝试修改别的东西，比如各种道具效果。
+
+7. 后记
+
+试着改了下道具效果，没有测试，但是地方应该是对了。
+
+搜索`Boost`，发现有个方法叫`StartBoost`，点进去看看。
+
+```csharp
+public void StartBoost(float distance, bool isMega)
+	{
+		DebugEx.Log("PICKUP: BOOST of " + distance);
+		bool hasBoost = this.HasBoost;
+		this.HasBoost = true;
+		this.IsMegaBoost = isMega;
+		if (!hasBoost)
+		{
+			this.VelocityBeforeBoost = ((!this.IsMegaBoost) ? this.GetRunVelocity() : this.MaxRunVelocity);
+			this.StartInvcibility(4f);
+		}
+		this.BoostDistanceLeft = distance + 50f;
+		this.TimeSinceLastPowerup = 0f;
+		this.StumbleKillTimer += 10f;
+	}
+```
+
+右键分析被谁调用，发现有个叫`UseHeadStartMega`，感觉像是我想要的，点进去看看。
+
+```csharp
+public void UseHeadStartMega()
+	{
+		if (!this.IsPaused && !this.IsInCountdown && !this.IsGameOver && !this.IsTutorialMode && !this.IsIntroScene && !this.GamePlayer.IsDead && !this.GamePlayer.IsFalling && this.DistanceTraveled > this.HeadStartStartDistance && this.DistanceTraveled < this.HeadStartEndDistance)
+		{
+			this.Audio.PlayFX(AudioManager.Effects.bonusPickup, 1f);
+			this.RecordManager.AdjustPlayerLevelForUpgradeType(this.PlayerManager.GetActivePlayer(), RecordManager.StoreItemType.kStoreItemHeadStartMega, -1);
+			this.RecordManager.SaveRecords();
+			float distance = this.HeadStartMegaBoostDistance - this.DistanceTraveled;
+			this.GamePlayer.StartBoost(distance, false);
+			this.UsedHeadStart = true;
+			if (!this.UsedPowers)
+			{
+				this.UsedPowers = true;
+				this.ScoreWhenFirstUsedPowers = this.GamePlayer.Score;
+			}
+		}
+	}
+```
+
+然后发现有个字段叫`HeadStartMegaBoostDistance`，这个应该就是道具冲刺的距离了，点进去看看。
+
+```csharp
+public float HeadStartMegaBoostDistance = 2350f;
+```
+
+如果觉得原本的冲刺距离不够爽，那就改成235000f好了~
