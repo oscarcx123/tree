@@ -272,6 +272,84 @@ def convert(ui):
 
 那么，如何知道一个组件都有什么方法呢？直接去[Qt官方文档](https://doc.qt.io/archives/qt-4.8/qtgui-module.html)查看就可以了。本节使用到的lineEdit的相关方法在[这里](https://doc.qt.io/archives/qt-4.8/qtextedit.html)
 
+## 0x06 threading
+
+1）前言
+
+这几天在用PyQt5写东西的时候遇到这样一个问题，网上资料也特别少，我感觉值得拿出来说一说。
+
+我的程序中使用了threading模块，GUI作为主线程去启动负责逻辑处理的子线程。其中，我设计的GUI里头有一个日志框，用来代替终端显示各种日志输出。既然子线程是负责逻辑处理，那么想当然的就会直接在子线程操作GUI的显示。
+
+都说了想当然，那当然不行咯，在子线程对GUI操作的时候，终端会出现下面这个错误，但是程序又不会马上闪退。
+
+```Python
+QObject::connect: Cannot queue arguments of type 'QTextCursor'
+(Make sure 'QTextCursor' is registered using qRegisterMetaType().)
+```
+
+更让人摸不着头脑的是，过一阵子闪退的时候，会出现下面这句话：
+
+```
+段错误，核心已转储
+```
+
+这啥玩意儿？能说人话么？一番搜索之后，发现这个原来英语叫做“Segmentation fault (core dumped)”。
+
+"Segmentation fault"用人话来说大概就是“你尝试访问你无法访问的内存”。
+
+然后我把上面的报错信息搜索了下，发现之前有人在StackOverflow问过，但是答案牛头不对马嘴，不过倒是在评论区发现了大佬的留言。
+
+```
+It is likely that the asker was not actually directly using QTextCursor, but rather using GUI code from a thread that was not the GUI thread. Attempting this seems to result in this error arising from Qt-internal code, e.g. for QTextEdit.append()
+```
+
+简而言之，就是说虽然报错显示QTextCursor，但是实际上是在其它线程通过Qt内部的方法间接调用了这个东西。
+
+热心大佬还留了个[链接](https://stackoverflow.com/questions/2104779/qobject-qplaintextedit-multithreading-issues)，我跟过去看了，收获不少。
+
+```
+It appears you're trying to access QtGui classes from a thread other than the main thread. Like in some other GUI toolkits (e.g. Java Swing), that's not allowed.
+
+Although QObject is reentrant, the GUI classes, notably QWidget and all its subclasses, are not reentrant. They can only be used from the main thread.
+```
+
+这个终于说到点子上了，一句话总结就是子线程不能调用主线程的QtGui类。
+
+所以大佬给出的方案如下：
+
+```
+A solution is to use signals and slots for communication between the main thread (where the GUI objects live) and your secondary thread(s). Basically, you emit signals in one thread that get delivered to the QObjects via the other thread.
+```
+
+大概翻译下，就是说可以通过信号和槽来完成子线程跟GUI所在的主线程的通信，就是通过在子线程释放信号，传递到主线程的槽来完成。
+
+可惜的是，大佬并没有给出示例代码，那接下来就是动手实践了。
+
+2）实践
+
+首先我们在子线程的代码中创建一个对象，并且继承QObject（因为需要释放信号）。
+
+```Python
+class UpdateLog(QObject):
+    update_signal = pyqtSignal()
+ 
+    def __init__(self):
+        QObject.__init__(self)
+ 
+    def update(self):
+        self.update_signal.emit()
+```
+
+`update_signal = pyqtSignal()`就是使用Signal类来创建一个自定义的信号。
+
+`self.update_signal.emit()`就是当条件满足的时候，子线程可以调用UpdateLog类的update方法，就会发出信号。
+
+做完这些之后，主线程中别忘了连击信号和槽，比如`self.afk.utils.logger.update_signal.connect(self.write_log)`。然后现在再尝试运行程序，就没有任何问题了。
+
+不仅如此，其实其它需要共享的信息，也可以通过自定义信号和槽来传递。
+
+那么，现在就可以愉快的在PyQt程序中使用threading模块了。
+
 ## 0x0? 小结
 
 本文只是抛砖引玉，上面这些只是PyQt5的入门内容。不过学会了简单的交互方法，其它的也差不多能依葫芦画瓢做出来。
