@@ -2,7 +2,7 @@
 
 最近对Unity的逆向工程比较感兴趣，于是就开始自学，并把学习心得分享在这里。
 
-注：本篇内容仅供学习交流，请勿用于违法用途
+注：本篇内容仅供学习交流，请勿用于违法用途。本人所有逆向研究学习而产生的最终成品内容均不会进行发布和传播！如果你是想来下载各种破解APP的，可以点关闭了。
 
 ## 0x00 软件清单
 
@@ -12,6 +12,7 @@
 * JDK 12.0.2
 * IDA pro 7.2 (这个自行解决，IDA普通版不清楚是否可行)
 * dnSpy v6.0.5 (64-bit)
+* HxD 2.3.0.0
 * apktool 2.4.0
 
 ## 0x01 旅行青蛙 v1.0.4 (2019/09/02)
@@ -152,7 +153,7 @@ public static int CloverPointStock()
 }
 ```
 
-这里是获取玩家三叶草数量，我们直接修改成`return 9999`即可。
+这里是获取玩家三叶草数量，我直接修改成`return 9999`即可。
 
 进入`编辑IL指令`，因为只需要两条指令，所以删去多余的指令，然后指令1的操作码应为`idc.i4`，操作符是9999，指令2就是`ret`，不需要改动。
 
@@ -607,9 +608,9 @@ Press any key to exit...
 
 这里不使用dnSpy反编译找到的C#脚本，因为这些脚本实际上没啥用。
 
-然后就开始搜索关键词了，实际上为了效率我们可以利用前面1.0.4版本的未加密C#脚本来搜寻目标，但是现在是学习钻研逆向，当然不能偷懒。
+然后就开始搜索关键词了，实际上为了效率，可以利用前面1.0.4版本的未加密C#脚本来搜寻目标，但是现在是学习钻研逆向，当然不能偷懒。
 
-这里我们想修改三叶草的数量，那就搜索关键词`clover`，翻一翻就会发现有个方法叫做`getCloverPoint`，下面内容节选自`dump.cs`
+这里想修改三叶草的数量，那就搜索关键词`clover`，翻一翻就会发现有个方法叫做`getCloverPoint`，下面内容节选自`dump.cs`
 
 ```csharp
 public static DateTime Get_LoadDeviceTime(); // RVA: 0x49C504 Offset: 0x49C504
@@ -637,7 +638,7 @@ public static int RequestCountStock(); // RVA: 0x49DDA4 Offset: 0x49DDA4
 
 之前我的方向就出现了错误。我选择了`CloverPointStock()`这个方法来修改，但是后来却发现特别难弄。道理就是修改这个函数的返回值为一个固定数值，我感觉思路是对的，但是改了几次都没有成功，估计是技术还不过关吧，于是果断放弃，选择了后来证明可行的办法。
 
-因此，我们要的就是下面这一行。
+因此，要的就是下面这一行。
 
 ```csharp
 public static void getCloverPoint(int num); // RVA: 0x49D534 Offset: 0x49D534
@@ -649,7 +650,7 @@ Offset要记下来，下面要用到。
 
 在IDA中按G键（或者Jump > Jump to address），然后输入刚才得到的Offset（本例中就是0x49D534），就可以定位到代码了。
 
-此时我们看到下面内容（这里节选一段）
+此时看到下面内容（这里节选一段）
 
 ```assembly
 ; Attributes: bp-based frame
@@ -671,9 +672,9 @@ MOV             W19, W0
 TBNZ            W8, #0, loc_49D56C
 ```
 
-其实里头说了啥，现在不用太关心，我们需要看看这个方法是被谁调用了。
+其实里头说了啥，现在不用太关心，需要看看这个方法是被谁调用了。
 
-使用快捷键`Ctrl+X`可以查看那些地方调用了`getCloverPoint`这个方法。果不其然，我们找到了一个叫`DisplayPanel$$BuyItem`的方法，点进去看看。
+使用快捷键`Ctrl+X`可以查看那些地方调用了`getCloverPoint`这个方法。果不其然，找到了一个叫`DisplayPanel$$BuyItem`的方法，点进去看看。
 
 ```assembly
 loc_5DA8C0
@@ -694,13 +695,13 @@ MOV             X21, X0
 CBNZ            X21, loc_5DA900
 ```
 
-在调用方法之前，这里有一个NEG操作。这句的意思就是把W8 * (-1)，然后赋值给W0，其实就是说W0就是W8的相反数。结合方法名称叫做`getCloverPoint`，我们可以大胆推测，买东西的时候就是“获取负数量的三叶草”。
+在调用方法之前，这里有一个NEG操作。这句的意思就是把W8 * (-1)，然后赋值给W0，其实就是说W0就是W8的相反数。结合方法名称叫做`getCloverPoint`，可以大胆推测，买东西的时候就是“获取负数量的三叶草”。
 
 ```assembly
 NEG             W0, W8
 ```
 
-为了证实猜想，我们进去另一个调用了`getCloverPoint`的方法看看。我选择了`IAPPanel$$IAP_Complete`，因为一看就知道这个方法就是内购完成后进行的操作。代码如下。显而易见这里所使用的就是`MOV W0, W22`了。
+为了证实猜想，进去另一个调用了`getCloverPoint`的方法看看。我选择了`IAPPanel$$IAP_Complete`，因为一看就知道这个方法就是内购完成后进行的操作。代码如下。显而易见这里所使用的就是`MOV W0, W22`了。
 
 ```assembly
 loc_51B294
@@ -777,7 +778,7 @@ MOV             W0, W8
 
 在此处你应该能看到`E0 03 08 4B`，对了，这个就是`NEG W0, W8`。
 
-我们把光标移动到`E0 03 08 4B`的头部（E前面），然后直接输入`E003082A`即可，输入的时候会自动覆盖掉原来的内容。改完记得保存。
+把光标移动到`E0 03 08 4B`的头部（E前面），然后直接输入`E003082A`即可，输入的时候会自动覆盖掉原来的内容。改完记得保存。
 
 9. 打包 & 签名
 
@@ -971,3 +972,271 @@ public float HeadStartMegaBoostDistance = 2350f;
 ```
 
 如果觉得原本的冲刺距离不够爽，那就改成235000f好了~
+
+## 0x04 神庙逃亡2 v1.12.1 (2019/09/05)
+
+既然逆向了神庙逃亡1，那就顺手把神庙逃亡2也逆向了吧~
+
+这次选择了老旧的1.12.1版本，因为这个版本没有进行加密。
+
+0. 获取神庙逃亡v1.12.1版本
+
+网上一搜一大把，我下载之后重命名为`temple2_1121.apk`。
+
+先进行常规步骤：用`apktool`进行反编译，找到Assembly-CSharp.dll，使用dnSpy反编译找到的C#脚本，寻找目标。
+
+注：后面为了节约时间，常规步骤会直接略过不写。
+
+在神庙逃亡2中，可以通过点击“关注Facebook”和“关注Twitter”来获取一定的资源，我的目标就是把这两个按钮变成无限提款机。
+
+1. 修改“关注Facebook”相关方法
+
+这里直接搜索方法`Facebook`，然后发现了一个叫`PerformLikeOnFacebook`的方法。
+
+```csharp
+private void PerformLikeOnFacebook()
+	{
+		UIConfirmDialog.onNegativeResponse -= this.CanceledLike;
+		UIConfirmDialog.onPositiveResponse -= this.PerformLikeOnFacebook;
+		EtceteraAndroid.showWebView("http://www.facebook.com/Tem****un");
+		GameProfile.SharedInstance.ProfileData.HasLikedOnFacebook = true;
+		if (this.FacebookGiftType == CostType.Coin)
+		{
+			GameProfile.SharedInstance.Player.coinCount += this.FacebookGiftAmount;
+		}
+		else if (this.FacebookGiftType == CostType.Special)
+		{
+			GameProfile.SharedInstance.Player.specialCurrencyCount += this.FacebookGiftAmount;
+		}
+		GameProfile.SharedInstance.Serialize();
+		this.FillInFreeOffers();
+	}
+```
+
+关键逻辑很明显，判断礼物类型，然后根据类型发放对应数额。但是既然要重复领取，总不能每次都弹出Facebook页面。所以直接把`EtceteraAndroid.showWebView("http://www.facebook.com/Tem****un");`对应的IL指令删掉即可。
+
+然后看到下一行是`GameProfile.SharedInstance.ProfileData.HasLikedOnFacebook = true;`，这个很明显就是用来记录是否领取过的flag，当然是要改成false啦。编辑IL指令，把`idc.i4.1`改成`idc.i4.0`即可。
+
+其实到这里就可以直接把`this.FacebookGiftAmount`替换成想要的数字就可以了，因为`this.FacebookGiftType`大概率不是`Coin`就是`Special`，但是我还是想直接把`if (this.FacebookGiftType == CostType.Coin)`替换成`if(true)`。因此单独把关键段落拿出来并看看IL代码。
+
+```csharp
+if (this.FacebookGiftType == CostType.Coin)
+		{
+			GameProfile.SharedInstance.Player.coinCount += this.FacebookGiftAmount;
+		}
+		else if (this.FacebookGiftType == CostType.Special)
+		{
+			GameProfile.SharedInstance.Player.specialCurrencyCount += this.FacebookGiftAmount;
+		}
+```
+
+我把IL代码加了空行，这样可以跟C#代码对应起来。
+
+```IL
+14	003C	ldarg.0
+15	003D	ldfld	valuetype CostType UIFreeStuffViewController::FacebookGiftType
+16	0042	brtrue	26 (0068) ldarg.0 
+
+17	0047	ldsfld	class GameProfile GameProfile::SharedInstance
+18	004C	callvirt	instance class PlayerStats GameProfile::get_Player()
+19	0051	dup
+20	0052	ldfld	int32 PlayerStats::coinCount
+21	0057	ldarg.0
+22	0058	ldfld	int32 UIFreeStuffViewController::FacebookGiftAmount
+23	005D	add
+24	005E	stfld	int32 PlayerStats::coinCount
+25	0063	br	38 (0090) ldsfld class GameProfile GameProfile::SharedInstance
+
+26	0068	ldarg.0
+27	0069	ldfld	valuetype CostType UIFreeStuffViewController::FacebookGiftType
+28	006E	ldc.i4.1
+29	006F	bne.un	38 (0090) ldsfld class GameProfile GameProfile::SharedInstance
+
+30	0074	ldsfld	class GameProfile GameProfile::SharedInstance
+31	0079	callvirt	instance class PlayerStats GameProfile::get_Player()
+32	007E	dup
+33	007F	ldfld	int32 PlayerStats::specialCurrencyCount
+34	0084	ldarg.0
+35	0085	ldfld	int32 UIFreeStuffViewController::FacebookGiftAmount
+36	008A	add
+37	008B	stfld	int32 PlayerStats::specialCurrencyCount
+```
+
+先看源代码第一句`if (this.FacebookGiftType == CostType.Coin)`。
+
+```IL
+14	003C	ldarg.0
+15	003D	ldfld	valuetype CostType UIFreeStuffViewController::FacebookGiftType
+16	0042	brtrue	26 (0068) ldarg.0 
+```
+
+这个`ldarg.0`就是this，下面这个`valuetype CostType UIFreeStuffViewController::FacebookGiftType`很明显就是比较的内容，`ldfld`顾名思义就是“Load Field”，作用大概就是获取对象的值（Push the value of field of object (or value type) obj, onto the stack.）。`brtrue`顾名思义就是“Branch True”，就是如果为真跳转到指定目标（Branch to target if value is non-zero (true).）
+
+直接改成下面这样，这时候C#代码就是`if(true)`。brfalse就是如果为假跳转到指定目标（Branch to target if value is zero (false).）
+
+```IL
+14	003C	ldc.i4.1
+15	003D	brfalse	25 (0063) ldarg.0 
+```
+
+接下来，我想让这个这个true分支中给钻石而不是给金币，那么就可以看看那一段的关键IL代码
+
+```IL
+20	0052	ldfld	int32 PlayerStats::coinCount
+21	0057	ldarg.0
+22	0058	ldfld	int32 UIFreeStuffViewController::FacebookGiftAmount
+23	005D	add
+24	005E	stfld	int32 PlayerStats::coinCount
+```
+
+用大白话说就是取出coinCount，取出FacebookGiftAmount，两个相加，然后赋值给coinCount。
+
+stfld应该就是赋值（Replace the value of field of the object obj with value.）。
+
+要修改ldfld内容的话也很容易。首先单击`20	0052	ldfld	int32 PlayerStats::coinCount`这行，选择“字段”，搜索`specialCurrencyCount`，在下方搜索结果选中，点击确定即可。
+
+最后结果就是下面这样，输入`ldc.i4	888888`会自动被转换成`ldc.i4	0xD9038`。此时C#代码是`GameProfile.SharedInstance.Player.specialCurrencyCount += 888888;`。
+
+```IL
+19	004D	ldfld	int32 PlayerStats::specialCurrencyCount
+20	0052	ldc.i4	0xD9038
+21	0057	add
+22	0058	stfld	int32 PlayerStats::specialCurrencyCount
+```
+
+这里针对点击“关注Facebook”按钮的修改就完成了。修改后的这个方法的C#代码如下：
+
+```csharp
+private void PerformLikeOnFacebook()
+	{
+		UIConfirmDialog.onNegativeResponse -= this.CanceledLike;
+		UIConfirmDialog.onPositiveResponse -= this.PerformLikeOnFacebook;
+		GameProfile.SharedInstance.ProfileData.HasLikedOnFacebook = false;
+		if (true)
+		{
+			GameProfile.SharedInstance.Player.specialCurrencyCount += 888888;
+		}
+		else if (this.FacebookGiftType == CostType.Special)
+		{
+			GameProfile.SharedInstance.Player.specialCurrencyCount += this.FacebookGiftAmount;
+		}
+		GameProfile.SharedInstance.Serialize();
+		this.FillInFreeOffers();
+	}
+```
+
+2. 修改“关注Twitter”相关方法
+
+方法是跟修改“关注Facebook”完全一样的。
+
+原始的`PerformLikeOnTwitter`方法如下：
+
+```csharp
+private void PerformLikeOnTwitter()
+	{
+		UIConfirmDialog.onNegativeResponse -= this.CanceledFollow;
+		UIConfirmDialog.onPositiveResponse -= this.PerformLikeOnTwitter;
+		EtceteraAndroid.showWebView("http://twitter.com/tem****un");
+		GameProfile.SharedInstance.ProfileData.HasLikedOnTwitter = true;
+		if (this.TwitterGiftType == CostType.Coin)
+		{
+			GameProfile.SharedInstance.Player.coinCount += this.TwitterGiftAmount;
+		}
+		else if (this.TwitterGiftType == CostType.Special)
+		{
+			GameProfile.SharedInstance.Player.specialCurrencyCount += this.TwitterGiftAmount;
+		}
+		GameProfile.SharedInstance.Serialize();
+		this.FillInFreeOffers();
+	}
+```
+
+修改之后应该是下面这样。
+
+```csharp
+private void PerformLikeOnTwitter()
+	{
+		UIConfirmDialog.onNegativeResponse -= this.CanceledFollow;
+		UIConfirmDialog.onPositiveResponse -= this.PerformLikeOnTwitter;
+		GameProfile.SharedInstance.ProfileData.HasLikedOnTwitter = false;
+		if (true)
+		{
+			GameProfile.SharedInstance.Player.coinCount += 999999;
+		}
+		else if (this.TwitterGiftType == CostType.Special)
+		{
+			GameProfile.SharedInstance.Player.specialCurrencyCount += this.TwitterGiftAmount;
+		}
+		GameProfile.SharedInstance.Serialize();
+		this.FillInFreeOffers();
+	}
+```
+
+3. 改开局冲刺距离
+
+这个很简单，搜索“Mega”就找到一个叫`OnMegaHeadStart`的方法，如下所示。
+
+```csharp
+public void OnMegaHeadStart()
+	{
+		GameProfile.SharedInstance.Player.coinCount -= GameProfile.SharedInstance.Player.GetMegaHeadStartCost();
+		GamePlayer.SharedInstance.StartBoost();
+		GamePlayer.SharedInstance.BoostDistanceLeft = 2500f;
+		GameController.SharedInstance.HeadStartsThisRun++;
+		TRAnalytics.logEvent("MegaHeadStart", true, false);
+		if (this.headStartRoot != null)
+		{
+			NGUITools.SetActive(this.headStartRoot.gameObject, false);
+		}
+		if (this.megaHeadStartRoot != null)
+		{
+			NGUITools.SetActive(this.megaHeadStartRoot.gameObject, false);
+		}
+		AudioManager.SharedInstance.PlayFX(AudioManager.Effects.cashRegister, 1f, 1f);
+	}
+```
+
+很明显，直接修改`BoostDistanceLeft`即可。
+
+4. 内购
+
+内购其实也不难，毕竟资源发放逻辑在本地。不够由于技术比较菜，找了半天才发现目标。
+
+突破口在于断网尝试内购的字符串“Cannot connect to the internet.”
+
+直接搜索“Cannot Connect”会发现叫做`ShowNetworkErrorDialog`的方法。点进去看看。
+
+```csharp
+public void ShowNetworkErrorDialog()
+	{
+		if (this.confirmDialog == null)
+		{
+			return;
+		}
+		this.confirmDialog.ShowInfoDialog("Error!", "Cannot connect to\nthe internet.", "Close");
+	}
+```
+
+嗯，这个就是蹦个对话框出来，跟观察到的相符。看看被谁调用了，发现有两个可疑方法，`TryRealMoneyPurchase`和`OnBuyIAP`。
+
+观察发现关键代码如下：
+
+```csharp
+this.PurchaseSuccessfulWithProductID(charData.ProductId, string.Empty);
+```
+
+接下来就简单了，直接修改对应逻辑，让上面两个方法直接执行“购买成功”的代码。修改后的代码就不贴了。
+
+5. 保存，签名，打包，真机测试成功。
+
+6. 收获
+
+这次学习了更加多的IL指令。而且通过逆向发现，内购其实就是跟内购服务通信之后，通过返回的内容决定是否发放对应物品。。。。。。比想象中的机制要简单很多啊~
+
+7. 参考链接
+
+* [OpCodes Class (System.Reflection.Emit) | Microsoft Docs](https://docs.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes?view=netframework-4.8)
+
+* [List of CIL instructions - Wikipedia](https://en.wikipedia.org/wiki/List_of_CIL_instructions)
+
+* [Why do I have to do ldarg.0 before calling a field in MSIL?](https://stackoverflow.com/questions/1785372/why-do-i-have-to-do-ldarg-0-before-calling-a-field-in-msil)
