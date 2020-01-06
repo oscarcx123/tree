@@ -621,3 +621,8 @@ sudo pip uninstall attrs
 ```
 
 然后重新执行“sudo pacman -Syu”即可。
+
+### OpenWRT
+
+#### 更新全部软件包
+opkg list-upgradable | cut -f 1 -d ' ' | xargs opkg upgrade
